@@ -34,6 +34,12 @@ a custom stereo matching network along with **IMU data**, making it fully compat
 
 ---
 
+<p align="center" style="margin:0">
+<img src="./imgs/vid1_highres.gif" alt="Path Following" width="600" border="0" />
+</p>
+
+
+
 ##  Quick Start
 
 ```bash
