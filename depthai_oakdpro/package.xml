@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>depthai_oakdpro</name>
+  <version>2.11.0</version>
+  <description>The depthai_examples package</description>
+
+  <maintainer email="mahmoud.tahmasebi@research.atu.ie">Mahmoud Tahmasebi</maintainer>
+  <author>Mahmoud Tahmasebi</author>
+
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  
+  <depend>rclcpp</depend>
+  <depend>cv_bridge</depend>
+  <depend>camera_info_manager</depend>
+  <depend>depthai</depend>
+  <depend>depthai_ros_msgs</depend>
+  <depend>depthai_bridge</depend>
+  <depend>depthai_descriptions</depend>
+  <depend>image_transport</depend>
+  <depend>libopencv-dev</depend>
+  <depend>ros_environment</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>stereo_msgs</depend>
+  <depend>vision_msgs</depend>
+  <depend>foxglove_msgs</depend>
+
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>depth_image_proc</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+
+</package>
