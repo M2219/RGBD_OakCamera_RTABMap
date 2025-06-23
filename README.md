@@ -43,24 +43,26 @@ git clone <this-repository-url>
 cd ..
 colcon build
 source install/setup.bash
+```
 
 ### Stereo Matching Network
 Use ```onnx_transformed.py``` to transfer the stereo matching model to .onnx and 
 use the below command to generate .plan file:
 
-```/usr/local/TensorRT-10.11.0.33/bin/trtexec --onnx=StereoModel.onnx --noTF32 --saveEngine=StereoModel.plan
+```bash
+/usr/local/TensorRT-10.11.0.33/bin/trtexec --onnx=StereoModel.onnx --noTF32 --saveEngine=StereoModel.plan
 ```
 
 and 
 
 ```bash
 cp StereoModel.plan /tmp
-
+```
 ### Terminal 1: Oak camera publilsher
 
 ```bash
 ros2 launch depthai_oakdpro depthai_oakdpro_cuda_node.launch.py
-
+```
 
 ### Terminal 2: RTAB-map 
 
@@ -75,7 +77,7 @@ ros2 launch rtabmap_launch rtabmap.launch.py \
   approx_sync:=true \
   approx_sync_max_interval:=0.001 \
   wait_imu_to_init:=true
-
+```
 ### Settings
 
 The following parameters can be adjusted in the launch file
