@@ -39,7 +39,7 @@ a custom stereo matching network along with **IMU data**, making it fully compat
 ```bash
 mkdir -p depthai_rgbd_oak/src
 cd depthai_rgbd_oak/src
-git clone <this-repository-url>
+git clone https://github.com/M2219/RGBD_OakCamera_RTABMap
 cd ..
 colcon build
 source install/setup.bash
