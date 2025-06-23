@@ -33,18 +33,20 @@ a custom stereo matching network along with **IMU data**, making it fully compat
 - [RTAB-Map](https://github.com/introlab/rtabmap)
 - OAK Camera (OAK-D LR with RGB images tested)
 
-Note 1: The code is written for left and right RGB images. The code can be adjusted for mono encoding by modifying depthai_oakdpro_cuda_node.cpp.
+Note 1: The code is written for left and right RGB images. The code can be adjusted for mono encoding by modifying a few lines in depthai_oakdpro_cuda_node.cpp.
 
 Note 2: Modify depthai_desc package to get the exact camera description compatible with your OAK camera.
 
 ---
 
 <p align="center" style="margin:0">
-<img src="./imgs/vid1_highres.gif" alt="Path Following" width="600" border="0" />
+<img src="./imgs/odom_optimized.gif" alt="Path Following" width="600" border="0" />
 </p>
 
 
 ##  Quick Start
+
+Note: adjust the TensorRT paths in the CMakeLists.txt
 
 ```bash
 mkdir -p depthai_rgbd_oak/src
