@@ -1,4 +1,4 @@
-# Synchronized RGB-D + IMU from OAK for RTAB-Map
+# Synchronized RGB-D + IMU from OAK Camera for RTAB-Map
 
 This repository provides a synchronized stereo vision pipeline using the **Luxonis OAK** camera. It generates **disparity-based RGB-D images** using
 a custom stereo matching network along with **IMU data**, making it fully compatible with **RTAB-Map** for real-time 3D SLAM and map reconstruction.
