@@ -90,6 +90,16 @@ ros2 launch rtabmap_launch rtabmap.launch.py \
   approx_sync_max_interval:=0.001 \
   wait_imu_to_init:=true
 ```
+
+### Camera description
+
+The depthai_desc package provides the camera's URDF and static transforms, 
+currently configured for the Luxonis OAK-D Pro. It publishes the necessary 
+/tf_static for frame relationships (e.g., oak_rgb_optical_frame, oak_left_camera_frame, etc.).
+
+```bash
+ros2 launch depthai_desc urdf_oak_launch.py 
+```
 ### Settings
 
 The following parameters can be adjusted in the launch file
