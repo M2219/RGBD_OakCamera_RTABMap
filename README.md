@@ -82,7 +82,7 @@ ros2 launch depthai_oakdpro depthai_oakdpro_cuda_node.launch.py
 ros2 launch rtabmap_launch rtabmap.launch.py \
   args:="--delete_db_on_start" \
   rgb_topic:=/left/image_rect \
-  depth_topic:=/disparity/image_raw \
+  depth_topic:=/depth/image_raw \
   camera_info_topic:=/left/camera_info \
   imu_topic:=/oak/imu \
   frame_id:=oak_stereo_frame \

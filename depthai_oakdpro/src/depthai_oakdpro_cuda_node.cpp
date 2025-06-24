@@ -315,7 +315,7 @@ int main(int argc, char **argv) {
     double Imuy = node->declare_parameter<double>("Imuy", -0.02);
     double Imuz = node->declare_parameter<double>("Imuz", 0.0);
 
-    auto disparity_pub = node->create_publisher<sensor_msgs::msg::Image>("/disparity/image_raw", 10);
+    auto disparity_pub = node->create_publisher<sensor_msgs::msg::Image>("/depth/image_raw", 10);
     auto left_rect_pub = node->create_publisher<sensor_msgs::msg::Image>("/left/image_rect", 10);
     auto right_rect_pub = node->create_publisher<sensor_msgs::msg::Image>("/right/image_rect", 10);
     auto left_info_pub = node->create_publisher<sensor_msgs::msg::CameraInfo>("left/camera_info", 10);
@@ -595,7 +595,7 @@ int main(int argc, char **argv) {
         leftCameraInfo.header.frame_id = header.frame_id;
         left_info_pub->publish(leftCameraInfo);
 
-        sensor_msgs::msg::Image::SharedPtr right_msg = cv_bridge::CvImage(header, "mono", right_img).toImageMsg();
+        sensor_msgs::msg::Image::SharedPtr right_msg = cv_bridge::CvImage(header, "rgb8", right_img).toImageMsg();
         right_rect_pub->publish(*right_msg);
         rightCameraInfo.header.stamp = header.stamp;
         rightCameraInfo.header.frame_id = header.frame_id;
