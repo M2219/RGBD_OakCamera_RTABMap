@@ -595,7 +595,7 @@ int main(int argc, char **argv) {
         leftCameraInfo.header.frame_id = header.frame_id;
         left_info_pub->publish(leftCameraInfo);
 
-        sensor_msgs::msg::Image::SharedPtr right_msg = cv_bridge::CvImage(header, "rgb8", right_img).toImageMsg();
+        sensor_msgs::msg::Image::SharedPtr right_msg = cv_bridge::CvImage(header, "mono", right_img).toImageMsg();
         right_rect_pub->publish(*right_msg);
         rightCameraInfo.header.stamp = header.stamp;
         rightCameraInfo.header.frame_id = header.frame_id;
