@@ -556,7 +556,7 @@ int main(int argc, char **argv) {
         visualize_and_record_disparity(
             disp_filtered,
             disp_filtered_16,
-            left_img,
+            left_img_cc,
             valid_mask,
             record_video,
             elapsed_ms,
