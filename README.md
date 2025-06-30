@@ -64,6 +64,7 @@ use the below command to generate .plan file:
 ```bash
 /usr/local/TensorRT-10.11.0.33/bin/trtexec --onnx=StereoModel.onnx --noTF32 --saveEngine=StereoModel.plan
 ```
+Alternatively, you can use ESMStereo for real-time and accurate stereo matching model: Follow the instruction in this repo [ESMStereo](https://github.com/M2219/ESMStereo)
 
 and 
 
