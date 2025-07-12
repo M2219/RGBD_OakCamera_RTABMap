@@ -220,11 +220,10 @@ void visualize_and_record_disparity(
     const cv::Mat& valid_mask,
     bool record_video,
     double elapsed_ms,
+    double fx,
+    double baseline,
     cv::VideoWriter& video_writer
 ) {
-
-    double fx = 758 / 2; // focal legnth
-    double baseline = 0.15;  // baseline
 
     int center_x = disparity.cols / 2;
     int center_y = disparity.rows / 2;
@@ -560,6 +559,8 @@ int main(int argc, char **argv) {
             valid_mask,
             record_video,
             elapsed_ms,
+            fx,
+            baseline,
             video_writer
         );
 
