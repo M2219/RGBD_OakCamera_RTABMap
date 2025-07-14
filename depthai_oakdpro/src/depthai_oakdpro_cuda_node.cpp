@@ -63,7 +63,7 @@ class Logger : public nvinfer1::ILogger
 
 static Logger gLogger;
 
-float* preprocess_image(const cv::Mat& img, const int net_input_width, const int net_input_height) {
+cv::Mat align_image(const cv::Mat& img, const int net_input_width, const int net_input_height) {
 
     int w = img.cols;
     int h = img.rows;
@@ -86,23 +86,20 @@ float* preprocess_image(const cv::Mat& img, const int net_input_width, const int
 
     cv::Mat final_img;
     if (pad_right > 0 || pad_bottom > 0) {
-        cv::copyMakeBorder(cropped_img, final_img, 0, pad_bottom, 0, pad_right, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
+        cv::copyMakeBorder(cropped_img, final_img, 0, pad_bottom, 0, pad_right, cv::BORDER_CONSTANT, cv::Scalar(0));
     } else {
         final_img = cropped_img.clone();
     }
 
-    cv::copyMakeBorder(
-        cropped_img,
-        final_img,
-        0, pad_bottom,
-        0, pad_right,
-        cv::BORDER_CONSTANT,
-        cv::Scalar(0, 0, 0)
-    );
+    return final_img;
+
+}
+
+float* preprocess_image(const cv::Mat& aligned_img) {
 
     // Convert to 3-channel RGB
     cv::Mat img_rgb;
-    cv::cvtColor(final_img, img_rgb, cv::COLOR_GRAY2RGB);
+    cv::cvtColor(aligned_img, img_rgb, cv::COLOR_GRAY2RGB);
 
     img_rgb.convertTo(img_rgb, CV_32FC3, 1.0 / 255.0);
 
@@ -242,7 +239,6 @@ void visualize_and_record_disparity(
 
     double max_val, min_val;
     cv::minMaxLoc(disp_filtered_16, &min_val, &max_val, nullptr, nullptr, valid_mask);
-    std::cout << "Disparity range: [" << min_val << ", " << max_val << "]" << std::endl;
     cv::Mat disp_norm, disp_color;
 
     disp_filtered_16.convertTo(disp_norm, CV_8UC1, -255.0 / (max_val - min_val), 255.0 * max_val / (max_val - min_val));
@@ -381,6 +377,7 @@ int main(int argc, char **argv) {
     camLeft->isp.link(stereo->left);
     camRight->isp.link(stereo->right);
 
+    stereo->setDepthAlign(dai::CameraBoardSocket::CAM_A);
     stereo->syncedLeft.link(xoutLeft->input);
     stereo->syncedRight.link(xoutRight->input);
 
@@ -474,15 +471,21 @@ int main(int argc, char **argv) {
 
         auto start = high_resolution_clock::now();
 
-        cv::Mat left_img = left->getCvFrame();
+        // Align RGB mage
         cv::Mat left_img_cc = left_cc->getCvFrame();
+        left_img_cc = align_image(left_img_cc, net_input_width, net_input_height);
+
+        // Align Rectifed images
+        cv::Mat left_img = left->getCvFrame();
         cv::Mat right_img = right->getCvFrame();
 
 
         // Run stereo inference
         float* outputData = new float[1 * net_input_width * net_input_height];
-        float* inputLeft = preprocess_image(left_img, net_input_width, net_input_height);
-        float* inputRight = preprocess_image(right_img, net_input_width, net_input_height);
+        left_img = align_image(left_img, net_input_width, net_input_height);
+        float* inputLeft = preprocess_image(left_img);
+        right_img = align_image(right_img, net_input_width, net_input_height);
+        float* inputRight = preprocess_image(right_img);
 
         // Copy input data to device
         cudaMemcpyAsync(buffers_[leftIndex_], inputLeft, inputSize_, cudaMemcpyHostToDevice, stream_);
@@ -501,13 +504,6 @@ int main(int argc, char **argv) {
         cudaStreamSynchronize(stream_);
 
         cv::Mat disp_mat(net_input_height, net_input_width, CV_32FC1, outputData);
-
-        int h = left_img.rows;
-        int w = left_img.cols;
-
-        if (pad_bottom > 0 || pad_right > 0) {
-            disp_mat = disp_mat(cv::Rect(0, 0, w, h));
-        }
 
         // 1. Spatial smoothing
         cv::medianBlur(disp_mat, disp_filtered, 5);
@@ -541,12 +537,11 @@ int main(int argc, char **argv) {
         cv::Mat depth_map_16u;
         depth_map.convertTo(depth_map_16u, CV_16UC1, 256.0);
 
-        cv::Mat padded_depth = cv::Mat::zeros(left_img_cc.size(), CV_16UC1);
-        depth_map_16u.copyTo(padded_depth(
-            cv::Rect(0, 0, depth_map_16u.cols, depth_map_16u.rows)
-        ));
+        //cv::Mat padded_depth = cv::Mat::zeros(left_img_cc.size(), CV_16UC1);
 
-        depth_map_16u = padded_depth;
+        //depth_map_16u.copyTo(padded_depth(cv::Rect(0, 0, depth_map_16u.cols, depth_map_16u.rows)));
+
+        //depth_map_16u = padded_depth;
 
         auto end = high_resolution_clock::now();
         double elapsed_ms = duration<double, std::milli>(end - start).count();
@@ -555,7 +550,7 @@ int main(int argc, char **argv) {
         visualize_and_record_disparity(
             disp_filtered,
             disp_filtered_16,
-            left_img_cc,
+            left_img,
             valid_mask,
             record_video,
             elapsed_ms,
@@ -564,12 +559,11 @@ int main(int argc, char **argv) {
             video_writer
         );
 
-        std::cout << "Original Image Size: " << left_img.cols << " x " << left_img.rows << std::endl;
+        std::cout << "Aligned Size: " << left_img.cols << " x " << left_img.rows << std::endl;
 
         delete[] inputLeft;
         delete[] inputRight;
         delete[] outputData;
-
 
         std_msgs::msg::Header header;
         header.stamp = rclcpp::Time(left_cc->getTimestamp().time_since_epoch().count());

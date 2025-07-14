@@ -18,8 +18,8 @@ find_package(OpenCV REQUIRED)
 find_package(CUDA REQUIRED)
 
 # TensorRT paths
-set(TENSORRT_INCLUDE_DIR /usr/local/TensorRT-10.11.0.33/include)
-set(TENSORRT_LIBRARY_DIR /usr/local/TensorRT-10.11.0.33/lib)
+set(TENSORRT_INCLUDE_DIR /usr/local/TensorRT-10.12.0.36/include)
+set(TENSORRT_LIBRARY_DIR /usr/local/TensorRT-10.12.0.36/lib)
 
 # Link directories
 link_directories(
