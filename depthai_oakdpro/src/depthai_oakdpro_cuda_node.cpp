@@ -536,11 +536,6 @@ int main(int argc, char **argv) {
         cv::Mat depth_map_16u;
         depth_map.convertTo(depth_map_16u, CV_16UC1, 256.0);
 
-        //cv::Mat padded_depth = cv::Mat::zeros(left_img_cc.size(), CV_16UC1);
-
-        //depth_map_16u.copyTo(padded_depth(cv::Rect(0, 0, depth_map_16u.cols, depth_map_16u.rows)));
-
-        //depth_map_16u = padded_depth;
 
         auto end = high_resolution_clock::now();
         double elapsed_ms = duration<double, std::milli>(end - start).count();
