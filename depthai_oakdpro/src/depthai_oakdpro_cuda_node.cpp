@@ -377,7 +377,6 @@ int main(int argc, char **argv) {
     camLeft->isp.link(stereo->left);
     camRight->isp.link(stereo->right);
 
-    stereo->setDepthAlign(dai::CameraBoardSocket::CAM_A);
     stereo->syncedLeft.link(xoutLeft->input);
     stereo->syncedRight.link(xoutRight->input);
 
