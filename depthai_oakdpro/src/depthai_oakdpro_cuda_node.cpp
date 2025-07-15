@@ -428,8 +428,8 @@ int main(int argc, char **argv) {
     const std::string leftRectPubName =  std::string("left/image_rect");
     const std::string rightRectPubName = std::string("right/image_rect");
 
-    auto leftCameraInfo = imageConverterLeft.calibrationToCameraInfo(calibrationHandler, dai::CameraBoardSocket::CAM_B, width, height);
-    auto rightCameraInfo = imageConverterRight.calibrationToCameraInfo(calibrationHandler, dai::CameraBoardSocket::CAM_C, width, height);
+    auto leftCameraInfo = imageConverterLeft.calibrationToCameraInfo(calibrationHandler, dai::CameraBoardSocket::CAM_B, net_input_width, net_input_height);
+    auto rightCameraInfo = imageConverterRight.calibrationToCameraInfo(calibrationHandler, dai::CameraBoardSocket::CAM_C, net_input_width, net_input_height);
 
     auto imuQueue = device->getOutputQueue("imu", 30, false);
 
@@ -537,6 +537,7 @@ int main(int argc, char **argv) {
         depth_map.convertTo(depth_map_16u, CV_16UC1, 256.0);
 
 
+
         auto end = high_resolution_clock::now();
         double elapsed_ms = duration<double, std::milli>(end - start).count();
         std::cout << "Elapsed time: " << elapsed_ms << " ms" << std::endl;
@@ -544,7 +545,7 @@ int main(int argc, char **argv) {
         visualize_and_record_disparity(
             disp_filtered,
             disp_filtered_16,
-            left_img,
+            left_img_cc,
             valid_mask,
             record_video,
             elapsed_ms,
@@ -563,6 +564,7 @@ int main(int argc, char **argv) {
         header.stamp = rclcpp::Time(left_cc->getTimestamp().time_since_epoch().count());
         header.frame_id = "oak_stereo_frame";
 
+        std::cout <<"depth_map_16u" <<  "Rows: " << depth_map_16u.rows << ", Cols: " << depth_map_16u.cols << std::endl;
         sensor_msgs::msg::Image::SharedPtr disp_msg = cv_bridge::CvImage(header, "16UC1", depth_map_16u).toImageMsg();
         disparity_pub->publish(*disp_msg);
 
@@ -578,6 +580,8 @@ int main(int argc, char **argv) {
 
         cv::Mat left_img_rgb;
         cv::cvtColor(left_img_cc, left_img_rgb, cv::COLOR_BGR2RGB);
+        std::cout << "left_img_cc size: " << left_img_cc.cols << "x" << left_img_cc.rows << std::endl;
+
         sensor_msgs::msg::Image::SharedPtr left_msg = cv_bridge::CvImage(header, "rgb8", left_img_rgb).toImageMsg();
         left_rect_pub->publish(*left_msg);
         leftCameraInfo.header.stamp = header.stamp;
