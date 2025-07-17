@@ -27,9 +27,6 @@
 #include <geometry_msgs/msg/transform_stamped.hpp>
 
 
-std::mutex queue_mutex;
-std::condition_variable queue_cv;
-bool shutdown_flag = false;
 cv::VideoWriter video_writer;
 cv::Mat disp_filtered;
 namespace fs = std::filesystem;
@@ -367,7 +364,7 @@ int main(int argc, char **argv) {
 
     camRight->setBoardSocket(dai::CameraBoardSocket::RIGHT);
     camRight->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1200_P);
-    camRight->setIspScale(1, 3);  // 1920x1200  ^f^r 1280x800
+    camRight->setIspScale(1, 3);
     camRight->setInterleaved(false);
     camRight->setColorOrder(dai::ColorCameraProperties::ColorOrder::BGR);
     camRight->setFps(30.0);
