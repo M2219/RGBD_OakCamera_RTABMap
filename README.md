@@ -110,7 +110,7 @@ mkdir ~/open3d_data
 
 1. Run the package and the RGBD data will be stored in ~/open3d_data/OakCamera
 
-2. Adjust the configs based on your Oak camera model in ```config``
+2. Adjust the configs based on your Oak camera model in ```config```
 
 3. Build [open3D](https://github.com/isl-org/Open3D.git)
 
