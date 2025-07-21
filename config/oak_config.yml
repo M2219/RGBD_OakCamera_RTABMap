@@ -2,11 +2,11 @@ name: Default reconstruction system config
 device: CUDA:0
 engine: tensor
 multiprocessing: false
-path_dataset: '/home/stereo/open3d_data/OakCamera/'
+path_dataset: '~/open3d_data/OakCamera/'
 depth_folder: depth
 color_folder: color
 path_intrinsic: ''
-path_color_intrinsic: '/home/stereo/Open3D/examples/python/t_reconstruction_system/oak_intrinsics.json'
+path_color_intrinsic: 'path/to/oak_intrinsics.json'
 depth_min: 0.1
 depth_max: 5.0
 depth_scale: 1000.0
