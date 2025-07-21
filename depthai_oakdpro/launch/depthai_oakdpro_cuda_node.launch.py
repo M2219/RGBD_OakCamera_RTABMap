@@ -94,7 +94,8 @@ def generate_launch_description():
             'net_input_height': 384, # network input height
             'Imux': 0.0, # Imu x offset from the left camera
             'Imuy': -0.02, # Imu y offset from the left camera
-            'Imuz': 0.0 # Imu z offset from the left camera
+            'Imuz': 0.0, # Imu z offset from the left camera
+            'open3D_save': True # Save data to use in Open3D reconstruction
         }]
     )
 

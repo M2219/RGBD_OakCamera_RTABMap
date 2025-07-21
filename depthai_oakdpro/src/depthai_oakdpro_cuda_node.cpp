@@ -36,7 +36,7 @@ int pad_right;
 int pad_bottom;
 double max_disp = 192;
 float alpha = 0.5;
-bool record_video = false;  // Set to false to disable recording
+bool record_video = true;  // Set to false to disable recording
 std::string model_path_ = "/tmp/StereoModel.plan"; // path to the stereo model
 
 nvinfer1::ICudaEngine* engine_{nullptr};
@@ -123,6 +123,35 @@ float* preprocess_image(const cv::Mat& aligned_img) {
     }
 
     return chw;
+}
+
+std::string base_dir;
+std::string color_dir;
+std::string depth_dir;
+
+void saveOpen3DFormat(const cv::Mat& left_img_cc, const cv::Mat& depth_map_16u, int idx) {
+
+    if(idx == 0) {
+        base_dir = std::string(std::getenv("HOME")) + "/open3d_data/OakCamera/";
+        color_dir = base_dir + "color/";
+        depth_dir = base_dir + "depth/";
+
+        // Clean and recreate folders
+        fs::remove_all(base_dir);
+        fs::create_directories(color_dir);
+        fs::create_directories(depth_dir);
+
+    }
+    // Save color image (JPEG)
+    char color_filename[64];
+    std::snprintf(color_filename, sizeof(color_filename), "%06d.jpg", idx);
+    cv::imwrite(color_dir + color_filename, left_img_cc);
+
+    // Save depth image (PNG 16-bit)
+    char depth_filename[64];
+    std::snprintf(depth_filename, sizeof(depth_filename), "%06d.png", idx);
+    cv::imwrite(depth_dir + depth_filename, depth_map_16u);
+
 }
 
 nvinfer1::ICudaEngine* loadEngine(const std::string& engineFile) {
@@ -306,6 +335,7 @@ int main(int argc, char **argv) {
     double Imux = node->declare_parameter<double>("Imux", 0.0);
     double Imuy = node->declare_parameter<double>("Imuy", -0.02);
     double Imuz = node->declare_parameter<double>("Imuz", 0.0);
+    bool open3D_save = node->declare_parameter<bool>("open3D_save", false);
 
     auto disparity_pub = node->create_publisher<sensor_msgs::msg::Image>("/depth/image_raw", 10);
     auto left_rect_pub = node->create_publisher<sensor_msgs::msg::Image>("/left/image_rect", 10);
@@ -452,6 +482,7 @@ int main(int argc, char **argv) {
 
     geometry_msgs::msg::TransformStamped stereo_to_imu;
 
+    int frame_idx = 0;
     while (rclcpp::ok()) {
 
 
@@ -515,7 +546,7 @@ int main(int argc, char **argv) {
         disp_filtered.setTo(0, ~valid_mask);
 
         cv::Mat disp_filtered_16;
-        disp_filtered.convertTo(disp_filtered_16, CV_16UC1, 256.0);
+        disp_filtered.convertTo(disp_filtered_16, CV_16UC1, 1000.0);
 
         cv::Mat depth_map(disp_filtered.size(), CV_32FC1);
 
@@ -531,9 +562,23 @@ int main(int argc, char **argv) {
         }
 
         cv::Mat depth_map_16u;
-        depth_map.convertTo(depth_map_16u, CV_16UC1, 256.0);
+        depth_map.convertTo(depth_map_16u, CV_16UC1, 1000.0);
 
+        if (open3D_save){
+            cv::Mat padded_depth = cv::Mat::zeros(left_img_cc.size(), CV_16UC1);
+            depth_map_16u.copyTo(padded_depth(
+                cv::Rect(0, 0, depth_map_16u.cols, depth_map_16u.rows)
+            ));
 
+            depth_map_16u = padded_depth;
+            if (frame_idx > 10){
+                int idx = frame_idx - 11;
+                std::cout << "Saved: " << idx  << std::endl;
+                saveOpen3DFormat(left_img_cc, depth_map_16u, idx);
+            }
+
+            frame_idx = frame_idx + 1;
+        }
 
         auto end = high_resolution_clock::now();
         double elapsed_ms = duration<double, std::milli>(end - start).count();
@@ -596,6 +641,7 @@ int main(int argc, char **argv) {
     if (context_) delete context_;
     if (engine_) delete engine_;
     for (int i = 0; i < 3; ++i) if (buffers_[i]) cudaFree(buffers_[i]);
+    video_writer.release();
 
     rclcpp::executors::MultiThreadedExecutor executor;
     executor.add_node(node);

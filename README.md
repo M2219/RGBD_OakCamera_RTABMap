@@ -101,6 +101,29 @@ currently configured for the Luxonis OAK-D Pro. It publishes the necessary
 ```bash
 ros2 launch depthai_desc urdf_oak_launch.py 
 ```
+
+### Usage with open3D
+
+```bash
+mkdir ~/open3d_data
+```
+
+1. Run the package and the RGBD data will be stored in ~/open3d_data/OakCamera
+
+2. Adjust the configs based on your Oak camera model in ```config``
+
+3. Build [open3D](https://github.com/isl-org/Open3D.git)
+
+```bash
+cd Open3D/examples/python/t_reconstruction_system
+python3 dense_slam_gui.py --config /path/to/oak_config.yml
+```
+<p align="center" style="margin:0">
+<img src="./imgs/open3d.gif" alt="Path Following" width="600" border="0" />
+</p>
+
+
+
 ### Settings
 
 The following parameters can be adjusted in the launch file
@@ -120,6 +143,7 @@ depthai_node = Node(
         'net_input_height': 384, # network input height
         'Imux': 0.0, # Imu x offset from the left camera
         'Imuy': -0.02, # Imu y offset from the left camera
-        'Imuz': 0.0 # Imu z offset from the left camera
+        'Imuz': 0.0, # Imu z offset from the left camera
+        'open3D_save': True # Save data to use in Open3D reconstruction
     }]
 )
